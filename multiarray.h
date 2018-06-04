@@ -11,6 +11,10 @@ class MultiArray {
 		const std::size_t &n_rows,
 		const std::size_t &n_cols): a_(a), n_rows_(n_rows), n_cols_(n_cols) {}
 
+		MultiArray(const std::size_t &n_rows, const std::size_t &n_cols): a_(), n_rows_(n_rows), n_cols_(n_cols) {
+			a_.resize(n_rows * n_cols);
+		}
+
 		std::vector<T> a_;
 		std::size_t n_rows_;
 		std::size_t n_cols_;
