@@ -17,6 +17,8 @@ TEST_CASE("multiarray") {
 	for (auto i = 0; i < 4; ++i) {
 		for (auto j = 0; j < 2; ++j) {
 			CHECK(ma(i, j) == idx);
+			ma.update(i, j, idx - 1);
+			CHECK(ma(i, j) == idx - 1);
 			++idx;
 		}
 	}
