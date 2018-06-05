@@ -67,15 +67,15 @@ backward_algorithm(const std::size_t &n_states,
 
 				// initialize
 			    for (auto i = 0; i < n_states; ++i) {
-			        probs.update(i, T - 1, 1);
+			        probs.update(i, T - 1, emission_prob(i, observations[T - 1]));
 			    }
 
 			    // recursion
-			    for (auto t = T - 1; t >= 0; --t) {
+			    for (long t = T - 2; t >= 0; --t) {
 			        auto obs = observations[t];
 			        for (auto i = 0; i < n_states; ++i) {
 			            for (auto j = 0; j < n_states; ++j) {
-			                probs.update(i, t - 1, probs(i, t - 1) + probs(j, t) * transition_prob(i, j) * emission_prob(i, obs));
+			                probs.update(i, t, probs(i, t) + probs(j, t + 1) * transition_prob(i, j) * emission_prob(i, obs));
 			            }
 			        }
 			    }
@@ -83,7 +83,7 @@ backward_algorithm(const std::size_t &n_states,
 			    // termination
 			    double total = 0.0;
 			    for (auto i = 0; i < n_states; ++i) {
-			        total += probs(i, T - 1);
+			        total += probs(i, 0) * start_prob(i);
 			    }
 			    return total;
 			 }

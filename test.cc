@@ -35,4 +35,7 @@ TEST_CASE("forward_algorithm") {
 
 	double likelihood = forward_algorithm(n, obs, start_prob, trans_prob, emission_prob);
 	CHECK(doctest::Approx(likelihood) == 0.001372);
+
+	likelihood = backward_algorithm(n, obs, start_prob, trans_prob, emission_prob);
+	CHECK(doctest::Approx(likelihood) == 0.001372);
 }
