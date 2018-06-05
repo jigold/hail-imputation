@@ -55,3 +55,35 @@ forward_algorithm(const std::size_t &n_states,
 			    }
 			    return total;
 			 }
+
+const double
+backward_algorithm(const std::size_t &n_states,
+			 const std::vector<int> &observations,
+			 std::function<double(int)> start_prob,
+			 std::function<double(int, int)> transition_prob,
+			 std::function<double(int, int)> emission_prob) {
+			    const std::size_t T = observations.size();
+			    MultiArray<double> probs(n_states, T);
+
+				// initialize
+			    for (auto i = 0; i < n_states; ++i) {
+			        probs.update(i, T - 1, emission_prob(i, observations[T - 1]));
+			    }
+
+			    // recursion
+			    for (long t = T - 2; t >= 0; --t) {
+			        auto obs = observations[t];
+			        for (auto i = 0; i < n_states; ++i) {
+			            for (auto j = 0; j < n_states; ++j) {
+			                probs.update(i, t, probs(i, t) + probs(j, t + 1) * transition_prob(i, j) * emission_prob(i, obs));
+			            }
+			        }
+			    }
+
+			    // termination
+			    double total = 0.0;
+			    for (auto i = 0; i < n_states; ++i) {
+			        total += probs(i, 0) * start_prob(i);
+			    }
+			    return total;
+			 }
