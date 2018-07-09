@@ -33,11 +33,13 @@ PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variant
     }
 
     printf("Read %lu variants.\n", ct);
+
     std::sort(sites.begin(), sites.end());
+
     return variants.size();
 }
 
-const std::size_t
+std::size_t
 PLINKReader::read_fam(const std::string &fam_file, std::vector<std::string> &samples) {
 	printf("Reading FAM file: '%s'.\n", fam_file.c_str());
     std::ifstream ifs (fam_file, std::ifstream::in);
@@ -62,8 +64,7 @@ PLINKReader::read_fam(const std::string &fam_file, std::vector<std::string> &sam
     return samples.size();
 }
 
-
-const char *
+char *
 PLINKReader::read_bed(const std::string &bed_file, const std::size_t &sz) {
 	int fd = open(bed_file.c_str(), O_RDONLY);
 	if (fd == -1) {

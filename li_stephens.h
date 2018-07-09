@@ -38,13 +38,13 @@ class LSModel {
 		double backward_algorithm(double &theta, double &c, double &g);
 
 	private:
-		inline const double emission_prob(int const&, int const&, double const&);
-		inline const std::size_t distance(int const&, int const&);
+		inline double emission_prob(int const&, int const&, double const&) const;
+		inline std::size_t distance(int const&, int const&) const;
 };
 
 inline
-const double
-LSModel::emission_prob(const int &i, const int &t, const double &g) {
+double
+LSModel::emission_prob(const int &i, const int &t, const double &g) const {
     auto gt_i = reference(t, i);
     auto gt_sample = sample(t, s_idx);
 
@@ -65,8 +65,8 @@ LSModel::emission_prob(const int &i, const int &t, const double &g) {
 };
 
 inline
-const std::size_t
-LSModel::distance(const int &i, const int &j) {
+std::size_t
+LSModel::distance(const int &i, const int &j) const {
     return reference.distance(i, j);
 };
 
