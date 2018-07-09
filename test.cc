@@ -14,9 +14,19 @@ TEST_CASE("variant") {
 	Variant v1 {"1", 1, "C", "A", 0};
 	Variant v2 {"1", 1, "C", "A", 0};
 	Variant v3 {"2", 2, "T", "G", 0};
+	Variant v4 {"1", 5, "C", "A", 0};
+    Variant v5 {"1", 2, "T", "C", 0};
+    Variant v6 {"1", 2, "T", "A", 0};
+
 
 	CHECK(v1 == v2);
 	CHECK(v1 != v3);
+	CHECK(v1 < v3);
+	CHECK(!(v1 < v2));
+
+	std::vector<Variant> variants {v1, v3, v6, v4, v5};
+    std::sort(variants.begin(), variants.end());
+    CHECK(variants == std::vector<Variant> {v1, v6, v5, v4, v3});
 }
 
 TEST_CASE("plink loader") {

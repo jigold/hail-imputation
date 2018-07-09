@@ -72,7 +72,7 @@ PLINKReader::operator() (const std::size_t &v_idx, const std::size_t &s_idx) con
 inline
 const std::size_t
 PLINKReader::distance(const std::size_t &i, const std::size_t &j) const {
-	return abs(variants[i].pos - variants[j].pos);
+	return abs(variants[i].pos() - variants[j].pos());
 }
 
 #endif
