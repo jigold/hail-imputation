@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include "variant.h"
 #include "io_plink.h"
+#include "site.h"
 
 
 std::size_t

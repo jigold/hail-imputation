@@ -9,6 +9,7 @@
 #include "multiarray.cc"
 #include "variant.h"
 #include "li_stephens.h"
+#include "site.h"
 
 TEST_CASE("variant") {
 	Variant v1 {"1", 1, "C", "A", 0};
