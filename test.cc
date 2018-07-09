@@ -29,6 +29,16 @@ TEST_CASE("variant") {
     CHECK(variants == std::vector<Variant> {v1, v6, v5, v4, v3});
 }
 
+TEST_CASE("site") {
+	Site s1 {Variant {"1", 1, "C", "A", 0}, 2};
+	Site s2 {Variant {"1", 1, "A", "T", 0}, 0};
+	Site s3 {Variant {"1", 1, "C", "A", 0}, 1};
+
+	std::vector<Site> sites {s1, s2, s3};
+	std::sort(sites.begin(), sites.end());
+	CHECK(sites == std::vector<Site> {s2, s3, s1});
+}
+
 TEST_CASE("plink loader") {
 	PLINKReader pr {"data/example1"};
 

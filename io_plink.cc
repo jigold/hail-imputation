@@ -9,8 +9,8 @@
 #include "io_plink.h"
 
 
-const std::size_t
-PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variants) {
+std::size_t
+PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variants, std::vector<Site> &sites) {
 	printf("Reading BIM file: '%s'.\n", bim_file.c_str());
     std::ifstream ifs (bim_file, std::ifstream::in);
     std::string line;
@@ -22,6 +22,7 @@ PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variant
             std::vector<std::string> v(std::istream_iterator<std::string>{iss},
                                        std::istream_iterator<std::string>());
 			variants.push_back(Variant(v[0], std::stoi(v[3]), v[4], v[5], std::stold(v[2])));
+			sites.push_back(Site(Variant(v[0], std::stoi(v[3]), v[4], v[5], std::stold(v[2])), ct));
             ct += 1;
         }
         ifs.close();
@@ -31,6 +32,7 @@ PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variant
     }
 
     printf("Read %lu variants.\n", ct);
+    std::sort(sites.begin(), sites.end());
     return variants.size();
 }
 

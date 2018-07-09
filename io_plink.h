@@ -9,6 +9,45 @@
 #include "variant.h"
 
 
+class Site {
+	public:
+		Site(const Variant &v, const std::size_t &idx): v_(v), idx_(idx) {}
+
+		Variant v() const { return v_; }
+		std::size_t idx() const { return idx_; }
+
+        bool operator==(const Site &other) const;
+		bool operator!=(const Site &other) const;
+		bool operator<(const Site &other) const;
+
+	private:
+		Variant v_;
+		std::size_t idx_;
+};
+
+inline
+bool Site::operator==(const Site& other) const {
+    if (typeid(*this) != typeid(other))
+        return false;
+
+    return v_ == other.v() && idx_ == other.idx();
+}
+
+inline
+bool Site::operator!=(const Site& other) const {
+    return !(*this == other);
+}
+
+
+inline
+bool Site::operator<(const Site& other) const {
+    if (v_ != other.v()) {
+        return v_ < other.v();
+    } else {
+        return idx_ < other.idx();
+    }
+}
+
 class PLINKReader {
 	public:
 		PLINKReader(const std::string &bfile): PLINKReader(bfile + ".bed", bfile + ".bim", bfile + ".fam") {}
@@ -17,7 +56,7 @@ class PLINKReader {
 					const std::string &bim_file,
 					const std::string &fam_file) {
 						n_samples = read_fam(fam_file, samples);
-						n_variants = read_bim(bim_file, variants);
+						n_variants = read_bim(bim_file, variants, sites);
 						row_sz = (n_samples + 3) / 4;
 						bed_sz = 3 + (n_variants * row_sz);
 						data_sz = n_variants * row_sz;
@@ -28,6 +67,7 @@ class PLINKReader {
 
 		std::vector<Variant> variants;
 		std::vector<std::string> samples;
+		std::vector<Site> sites;
 		std::size_t n_samples;
 		std::size_t n_variants;
 		std::size_t data_sz;
@@ -38,7 +78,7 @@ class PLINKReader {
 	private:
 		std::size_t row_sz;
 		std::size_t bed_sz;
-        const std::size_t read_bim(const std::string &bim_file, std::vector<Variant> &variants);
+        std::size_t read_bim(const std::string &bim_file, std::vector<Variant> &variants, std::vector<Site> &sites);
         const std::size_t read_fam(const std::string &fam_file, std::vector<std::string> &samples);
         const char *read_bed(const std::string &bed_file, const std::size_t &sz);
 };
