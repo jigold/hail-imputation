@@ -6,42 +6,66 @@
 class Variant {
     public:
         Variant(
-        const std::string &contig_,
-        const int &pos_,
-        const std::string &ref_,
-        const std::string &alt_,
-        const double &pos_cm_) : contig(contig_), pos(pos_), ref(ref_), alt(alt_), pos_cm(pos_cm_) {}
+        const std::string &contig,
+        const int &pos,
+        const std::string &ref,
+        const std::string &alt,
+        const double &pos_cm) : contig_(contig), pos_(pos), ref_(ref), alt_(alt), pos_cm_(pos_cm) {}
 
-        const std::string contig;
-        const int pos;
-        const std::string ref;
-        const std::string alt;
-        const double pos_cm;
-        const std::string to_string();
-        const bool operator==(const Variant& other) const;
-		const bool operator!=(const Variant& other) const;
+        std::string contig() const { return contig_; }
+        int pos() const { return pos_; }
+        std::string ref() const { return ref_; }
+        std::string alt() const { return alt_; }
+        double pos_cm() const { return pos_cm_; }
+
+
+        std::string to_string() const;
+
+        bool operator==(const Variant &other) const;
+		bool operator!=(const Variant &other) const;
+		bool operator<(const Variant &other) const;
+
+	private:
+		std::string contig_;
+		int pos_;
+		std::string ref_;
+		std::string alt_;
+		double pos_cm_;
 };
 
 inline
-const std::string Variant::to_string() {
-    return contig + ":" + std::to_string(pos) + ":" + ref + ":" + alt;
+std::string Variant::to_string() const {
+    return contig_ + ":" + std::to_string(pos_) + ":" + ref_ + ":" + alt_;
 }
 
 inline
-const bool Variant::operator==(const Variant& other) const {
+bool Variant::operator==(const Variant& other) const {
     if (typeid(*this) != typeid(other))
         return false;
 
-    return contig == other.contig &&
-        pos == other.pos &&
-        ref == other.ref &&
-        alt == other.alt &&
-        pos_cm == other.pos_cm;
+    return contig_ == other.contig() &&
+        pos_ == other.pos() &&
+        ref_ == other.ref() &&
+        alt_ == other.alt() &&
+        pos_cm_ == other.pos_cm();
 }
 
 inline
-const bool Variant::operator!=(const Variant& other) const {
+bool Variant::operator!=(const Variant& other) const {
     return !(*this == other);
+}
+
+inline
+bool Variant::operator<(const Variant& other) const {
+    if (contig_ != other.contig()) {
+        return (contig_ < other.contig());
+    } else if (pos_ != other.pos()) {
+        return (pos_ < other.pos());
+    } else if (ref_ != other.ref()) {
+        return (ref_ < other.ref());
+    } else {
+        return (alt_ < other.alt());
+    };
 }
 
 #endif

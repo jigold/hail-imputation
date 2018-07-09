@@ -34,7 +34,6 @@ PLINKReader::read_bim(const std::string &bim_file, std::vector<Variant> &variant
     return variants.size();
 }
 
-
 const std::size_t
 PLINKReader::read_fam(const std::string &fam_file, std::vector<std::string> &samples) {
 	printf("Reading FAM file: '%s'.\n", fam_file.c_str());
