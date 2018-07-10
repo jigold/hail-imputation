@@ -16,16 +16,9 @@ class LSModel {
 				zipped_result = zip_sites(reference, sample);
 				n_states = reference.n_samples;
                 n_obs = zipped_result.n_both;
-                probs = MultiArray<double> {n_states, n_obs};
+                alpha = MultiArray<double> {n_states, n_obs};
+				beta = MultiArray<double> {n_states, n_obs};
 			}
-
-		LSModel(const PLINKReader &reference, const PLINKReader &sample,
-			const std::size_t &s_idx, MultiArray<double> &probs): reference(reference), sample(sample), s_idx(s_idx), probs(probs) {
-			zipped_result = zip_sites(reference, sample);
-            n_states = reference.n_samples;
-            n_obs = zipped_result.n_both;
-            assert(probs.n_rows == n_states && probs.n_cols == n_obs);
-        }
 
 		// FIXME: add destructor
 
@@ -34,15 +27,14 @@ class LSModel {
 		std::size_t n_states;
 		std::size_t n_obs;
 		std::size_t s_idx;
-		MultiArray<double> probs;
+		MultiArray<double> alpha;
+		MultiArray<double> beta;
 		ZippedResult zipped_result;
 
 		void set_sample_idx(std::size_t &i) { s_idx = i; }
 
 		double forward_pass(double &theta, double &c, double &g);
-
-//		double forward_algorithm(double &theta, double &c, double &g);
-//		double backward_algorithm(double &theta, double &c, double &g);
+		double backward_pass(double &theta, double &c, double &g);
 
 	private:
 		inline double emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, double const&) const;

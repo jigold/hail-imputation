@@ -151,8 +151,8 @@ TEST_CASE("li_stephens") {
 	PLINKReader sample {"data/example2"};
 	LSModel ls {reference, sample};
 
-	CHECK(ls.probs.n_rows == 10);
-    CHECK(ls.probs.n_cols == 5);
+	CHECK(ls.alpha.n_rows == 10);
+    CHECK(ls.alpha.n_cols == 5);
 
 	auto g = 0.01;
 	auto theta = 0.2;
@@ -173,11 +173,11 @@ TEST_CASE("li_stephens") {
         0.099, 0.00152837, 0.045342383, 0.000715108, 0.020534974
 	};
 
-	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
+	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
 	CHECK(doctest::Approx(f_likelihood) == 0.066071902);
 
-//	auto b_likelihood = ls.backward_algorithm(theta, c, g);
-//	CHECK(doctest::Approx(b_likelihood) == 0.066071902);
+	auto b_likelihood = ls.backward_pass(theta, c, g);
+	CHECK(doctest::Approx(b_likelihood) == 0.066071902);
 }
 
 TEST_CASE("li_stephens_uneven") {
@@ -185,8 +185,8 @@ TEST_CASE("li_stephens_uneven") {
 	PLINKReader sample {"data/example3"};
 	LSModel ls {reference, sample};
 
-	CHECK(ls.probs.n_rows == 10);
-    CHECK(ls.probs.n_cols == 2);
+	CHECK(ls.alpha.n_rows == 10);
+    CHECK(ls.alpha.n_cols == 2);
 
 	auto g = 0.01;
 	auto theta = 0.2;
@@ -207,8 +207,11 @@ TEST_CASE("li_stephens_uneven") {
 		0.099, 0.259923805
 	};
 
-	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
+	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
 	CHECK(doctest::Approx(f_likelihood) == 0.79815);
+
+	auto b_likelihood = ls.backward_pass(theta, c, g);
+	CHECK(doctest::Approx(b_likelihood) == 0.79815);
 }
 
 TEST_CASE("li_stevens_multiple_contigs") {
@@ -217,8 +220,8 @@ TEST_CASE("li_stevens_multiple_contigs") {
 
 	LSModel ls {reference, sample};
 
-    CHECK(ls.probs.n_rows == 1);
-    CHECK(ls.probs.n_cols == 2);
+    CHECK(ls.alpha.n_rows == 1);
+    CHECK(ls.alpha.n_cols == 2);
 
     auto g = 0.01;
     auto theta = 0.2;
@@ -230,8 +233,11 @@ TEST_CASE("li_stevens_multiple_contigs") {
         0.99, 0.99
     };
 
-	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
+	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
 	CHECK(doctest::Approx(f_likelihood) == 0.99);
+
+	auto b_likelihood = ls.backward_pass(theta, c, g);
+	CHECK(doctest::Approx(b_likelihood) == 0.99);
 }
 
 // optimization -- transpose probs matrix
