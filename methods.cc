@@ -37,15 +37,15 @@ forward_algorithm(
 
 	// initialize
     for (auto i = 0; i < n_states; ++i) {
-        probs.update(i, 0, start_prob(i) * emission_prob(i, 0));
+        probs(i, 0) = start_prob(i) * emission_prob(i, 0);
     }
 
     // recursion
     for (auto t = 1; t < n_obs; ++t) {
         for (auto j = 0; j < n_states; ++j) {
-	        probs.update(j, t, 0);
+	        probs(j, t) = 0;
             for (auto i = 0; i < n_states; ++i) {
-                probs.update(j, t, probs(j, t) + probs(i, t - 1) * transition_prob(i, j) * emission_prob(j, t));
+                probs(j, t) = probs(j, t) + probs(i, t - 1) * transition_prob(i, j) * emission_prob(j, t);
             }
         }
     }
@@ -71,15 +71,15 @@ backward_algorithm(
 
 	// initialize
 	for (auto i = 0; i < n_states; ++i) {
-	    probs.update(i, n_obs - 1, emission_prob(i, n_obs - 1));
+	    probs(i, n_obs - 1) = emission_prob(i, n_obs - 1);
 	}
 
 	// recursion
 	for (long t = n_obs - 2; t >= 0; --t) {
 	    for (auto i = 0; i < n_states; ++i) {
-	        probs.update(i, t, 0);
+	        probs(i, t) = 0;
 	        for (auto j = 0; j < n_states; ++j) {
-	            probs.update(i, t, probs(i, t) + probs(j, t + 1) * transition_prob(i, j) * emission_prob(i, t));
+	            probs(i, t) = probs(i, t) + probs(j, t + 1) * transition_prob(i, j) * emission_prob(i, t);
 	        }
 	    }
 	}

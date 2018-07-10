@@ -121,7 +121,7 @@ TEST_CASE("multiarray") {
 	for (auto i = 0; i < 4; ++i) {
 		for (auto j = 0; j < 2; ++j) {
 			CHECK(ma(i, j) == idx);
-			ma.update(i, j, idx - 1);
+			ma(i, j) = idx - 1;
 			CHECK(ma(i, j) == idx - 1);
 			++idx;
 		}
@@ -161,23 +161,23 @@ TEST_CASE("li_stephens") {
 	auto f_likelihood = ls.forward_pass(theta, c, g);
 
 	std::vector<double> forward_probs_expected {
-        0.099, 0.00152837, 0.000458004, 0.034414951, 0.000483335,
-        0.099, 0.151308597, 0.001684301, 0.000357666, 0.000204497,
-        0.099, 0.00152837, 0.000458004, 0.034414951, 0.000483335,
-        0.099, 0.00152837, 0.045342383, 0.000715108, 0.020534974,
-        0.099, 0.00152837, 0.045342383, 0.000715108, 0.000207424,
-        0.099, 0.151308597, 0.166745765, 0.169198406, 0.001586849,
-        0.099, 0.151308597, 0.166745765, 0.001709075, 0.021340627,
-        0.099, 0.151308597, 0.001684301, 0.035408918, 0.000491473,
-        0.099, 0.00152837, 0.000458004, 0.000347626, 0.000204415,
-        0.099, 0.00152837, 0.045342383, 0.000715108, 0.020534974
+		0.198, 0.006113479, 0.003664031, 0.550639216, 0.015466719,
+		0.198, 0.605234387, 0.013474405, 0.005722653, 0.00654392,
+		0.198, 0.006113479, 0.003664031, 0.550639216, 0.015466719,
+		0.198, 0.006113479, 0.362739067, 0.011441728, 0.657119154,
+		0.198, 0.006113479, 0.362739067, 0.011441728, 0.006637567,
+		0.198, 0.605234387, 1.333966117, 2.707174489, 0.050779153,
+		0.198, 0.605234387, 1.333966117, 0.027345197, 0.682900059,
+		0.198, 0.605234387, 0.013474405, 0.566542685, 0.015727132,
+		0.198, 0.006113479, 0.003664031, 0.005562012, 0.006541289,
+		0.198, 0.006113479, 0.362739067, 0.011441728, 0.657119154
 	};
 
 	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
-	CHECK(doctest::Approx(f_likelihood) == 0.066071902);
+	CHECK(doctest::Approx(f_likelihood) == 2.11430086);
 
 	auto b_likelihood = ls.backward_pass(theta, c, g);
-	CHECK(doctest::Approx(b_likelihood) == 0.066071902);
+	CHECK(doctest::Approx(b_likelihood) == 2.11430086);
 }
 
 TEST_CASE("li_stephens_uneven") {
@@ -195,23 +195,23 @@ TEST_CASE("li_stephens_uneven") {
 	auto f_likelihood = ls.forward_pass(theta, c, g);
 
 	std::vector<double> forward_probs_expected {
-		0.099, 0.002625493,
-		0.099, 0.002625493,
-		0.099, 0.002625493,
-		0.099, 0.259923805,
-		0.099, 0.002625493,
-		0.099, 0.002625493,
-		0.099, 0.259923805,
-		0.099, 0.002625493,
-		0.099, 0.002625493,
-		0.099, 0.259923805
+		0.198, 0.010501972,
+		0.198, 0.010501972,
+		0.198, 0.010501972,
+		0.198, 1.039695219,
+		0.198, 0.010501972,
+		0.198, 0.010501972,
+		0.198, 1.039695219,
+		0.198, 0.010501972,
+		0.198, 0.010501972,
+		0.198, 1.039695219
 	};
 
 	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
-	CHECK(doctest::Approx(f_likelihood) == 0.79815);
+	CHECK(doctest::Approx(f_likelihood) == 3.19259946);
 
 	auto b_likelihood = ls.backward_pass(theta, c, g);
-	CHECK(doctest::Approx(b_likelihood) == 0.79815);
+	CHECK(doctest::Approx(b_likelihood) == 3.19259946);
 }
 
 TEST_CASE("li_stevens_multiple_contigs") {
@@ -230,14 +230,31 @@ TEST_CASE("li_stevens_multiple_contigs") {
     auto f_likelihood = ls.forward_pass(theta, c, g);
 
     std::vector<double> forward_probs_expected {
-        0.99, 0.99
+        1.98, 1.98
     };
 
 	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
-	CHECK(doctest::Approx(f_likelihood) == 0.99);
+	CHECK(doctest::Approx(f_likelihood) == 1.98);
 
 	auto b_likelihood = ls.backward_pass(theta, c, g);
-	CHECK(doctest::Approx(b_likelihood) == 0.99);
+	CHECK(doctest::Approx(b_likelihood) == 1.98);
+}
+
+TEST_CASE("li_stephens_identical_haplotype") {
+	PLINKReader reference {"data/example5"};
+	PLINKReader sample {"data/example5-chimera"};
+
+    auto g = 0.01;
+    auto theta = 0.2;
+    auto c = 0.4;
+
+	LSModel ls {reference, sample, 0};
+	auto f_likelihood = ls.forward_pass(theta, c, g);
+	auto b_likelihood = ls.backward_pass(theta, c, g);
+	CHECK(doctest::Approx(f_likelihood) == b_likelihood);
+	ls.compute_gamma(f_likelihood);
+
+	printf("%s\n", ls.gamma.to_string().c_str());
 }
 
 // optimization -- transpose probs matrix

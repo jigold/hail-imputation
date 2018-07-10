@@ -18,6 +18,7 @@ class LSModel {
                 n_obs = zipped_result.n_both;
                 alpha = MultiArray<double> {n_states, n_obs};
 				beta = MultiArray<double> {n_states, n_obs};
+				gamma = MultiArray<double> {n_states, n_obs};
 			}
 
 		// FIXME: add destructor
@@ -29,12 +30,14 @@ class LSModel {
 		std::size_t s_idx;
 		MultiArray<double> alpha;
 		MultiArray<double> beta;
+		MultiArray<double> gamma;
 		ZippedResult zipped_result;
 
 		void set_sample_idx(std::size_t &i) { s_idx = i; }
 
-		double forward_pass(double &theta, double &c, double &g);
-		double backward_pass(double &theta, double &c, double &g);
+		double forward_pass(const double &theta, const double &c, const double &g);
+		double backward_pass(const double &theta, const double &c, const double &g);
+		void compute_gamma(const double &p_obs);
 
 	private:
 		inline double emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, double const&) const;
@@ -47,20 +50,13 @@ LSModel::emission_prob(const std::size_t &i, const std::size_t &reference_v_idx,
     auto gt_i = reference(reference_v_idx, i);
     auto gt_sample = sample(sample_v_idx, s_idx);
 
-    if (gt_i == gt_sample) {
-        return (1 - g);
-    } else {
-        return g;
-    }
-
-// FIXME: This isn't correct.
-//    if (gt_i == -1 || gt_sample == -1) {
-//        return 1.0;
-//    } else if (gt_i == gt_sample) {
-//        return 2 * (1 - g);
-//    } else {
-//        return 2 * g;
-//    }
+   if (gt_i == -1 || gt_sample == -1) {
+       return 1.0;
+   } else if (gt_i == gt_sample) {
+       return 2 * (1 - g);
+   } else {
+       return 2 * g;
+   }
 };
 
 inline

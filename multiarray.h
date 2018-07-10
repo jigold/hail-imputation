@@ -21,24 +21,23 @@ class MultiArray {
 		std::size_t n_rows;
 		std::size_t n_cols;
 
-		inline const T operator() (const std::size_t &i, const std::size_t &j) const {
+		inline T& operator() (std::size_t i, std::size_t j) {
 			assert(i >= 0 && i < n_rows && j >= 0 && j < n_cols);
             return a[i * n_cols + j];
         }
-
-//        inline const T get (const std::size_t &i, const std::size_t &j) {
-//            return
-//        }
-
-        inline void update (const std::size_t &i, const std::size_t &j, const T &t) {
-            a[i * n_cols + j] = t;
+		
+		inline T operator() (const std::size_t i, const std::size_t j) const {
+			assert(i >= 0 && i < n_rows && j >= 0 && j < n_cols);
+            return a[i * n_cols + j];
         }
 
         inline void resize (const std::size_t &i, const std::size_t &j) {
             a.resize(i * j);
         }
 
-        const bool same (const MultiArray<T> &other, const double &tolerance);
+        bool same (const MultiArray<T> &other, const double &tolerance) const;
+
+		std::string to_string() const;
 };
 
 #endif
