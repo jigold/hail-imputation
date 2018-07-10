@@ -82,7 +82,13 @@ TEST_CASE("zip sites") {
 	PLINKReader pr1 {"data/example1"};
 	PLINKReader pr3 {"data/example3"};
 
-	auto zipped = zip_sites(pr1, pr3);
+	auto zipped_result = zip_sites(pr1, pr3);
+	auto zipped = zipped_result.zipped_sites;
+
+	CHECK(zipped.size() == 7);
+	CHECK(zipped_result.n_both == 2);
+	CHECK(zipped_result.n_only1 == 3);
+	CHECK(zipped_result.n_only2 == 2);
 
 	CHECK(*zipped[0].s1 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
 	CHECK(*zipped[0].s2 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
@@ -98,8 +104,6 @@ TEST_CASE("zip sites") {
 	CHECK(*zipped[5].s2 == Site { Variant {"5", 2, "C", "A", 0}, 1 });
 	CHECK(zipped[6].s1 == nullptr);
     CHECK(*zipped[6].s2 == Site { Variant {"5", 4, "C", "A", 0}, 3 });
-
-	CHECK(zipped.size() == 7);
 }
 
 

@@ -77,7 +77,7 @@ PLINKReader::distance(const std::size_t &i, const std::size_t &j) const {
 	return abs(variants[i].pos() - variants[j].pos());
 }
 
-std::vector<ZippedSite>
+ZippedResult
 zip_sites(const PLINKReader &pr1, const PLINKReader &pr2);
 
 #endif

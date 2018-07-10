@@ -82,31 +82,41 @@ PLINKReader::read_bed(const std::string &bed_file, const std::size_t &sz) {
     return ((char *) data) + 3;
 }
 
-std::vector<ZippedSite>
+ZippedResult
 zip_sites(const PLINKReader &pr1, const PLINKReader &pr2) {
+	std::size_t n_both = 0;
+	std::size_t n_only1 = 0;
+	std::size_t n_only2 = 0;
+
 	auto it1 = pr1.sites.begin();
 	auto it2 = pr2.sites.begin();
 	std::vector<ZippedSite> zipped_sites;
+
 	while (it1 != pr1.sites.end() || it2 != pr2.sites.end()) {
 		if (it1 != pr1.sites.end() && it2 != pr2.sites.end()) {
 			if (it1->v() == it2->v()) {
 				zipped_sites.push_back(ZippedSite {&*it1, &*it2});
 				++it1;
 				++it2;
+				++n_both;
 			} else if (it1->v() < it2->v()) {
 				zipped_sites.push_back(ZippedSite {&*it1, nullptr});
 				++it1;
+				++n_only1;
 			} else {
 				zipped_sites.push_back(ZippedSite {nullptr, &*it2});
 				++it2;
+				++n_only2;
 			}
 		} else if (it1 != pr1.sites.end()) {
 			zipped_sites.push_back(ZippedSite {&*it1, nullptr});
             ++it1;
+            ++n_only1;
 		} else {
 			zipped_sites.push_back(ZippedSite {nullptr, &*it2});
             ++it2;
+            ++n_only2;
 		}
 	}
-	return zipped_sites;
+	return ZippedResult {zipped_sites, n_both, n_only1, n_only2};
 }
