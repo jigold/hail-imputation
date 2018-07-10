@@ -2,6 +2,7 @@
 #define __SITE_H__
 
 #include <vector>
+#include <set>
 #include "variant.h"
 
 class Site {
@@ -59,6 +60,7 @@ struct ZippedSite {
 
 struct ZippedResult {
 	std::vector<ZippedSite> zipped_sites;
+	std::set<std::size_t> contig_boundaries;
 	std::size_t n_both;
 	std::size_t n_only1;
 	std::size_t n_only2;

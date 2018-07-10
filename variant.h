@@ -10,7 +10,9 @@ class Variant {
         const int &pos,
         const std::string &ref,
         const std::string &alt,
-        const double &pos_cm) : contig_(contig), pos_(pos), ref_(ref), alt_(alt), pos_cm_(pos_cm) {}
+        const double &pos_cm) : contig_(contig), pos_(pos), ref_(ref), alt_(alt), pos_cm_(pos_cm) {
+            assert(contig_ != "");
+        }
 
         std::string contig() const { return contig_; }
         int pos() const { return pos_; }

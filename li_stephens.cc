@@ -7,19 +7,21 @@
 double
 LSModel::forward_pass(double &theta, double &c, double &g) {
 	std::size_t t = 0;
+	std::size_t ct = 0;
 	std::size_t last_ref_v_idx = 0;
-
+	bool is_contig_boundary = true;
 	auto zipped = zipped_result.zipped_sites.begin();
+	auto cb = zipped_result.contig_boundaries;
 
 	while (zipped != zipped_result.zipped_sites.end()) {
 		if (zipped->s1 != nullptr && zipped->s2 != nullptr) {
 			auto ref_idx = zipped->s1->idx();
 			auto sample_idx = zipped->s2->idx();
-
-			if (t == 0) {
+			if (is_contig_boundary) {
 			    for (auto i = 0; i < n_states; ++i) {
-                    probs.update(i, 0, (1.0 / n_states) * emission_prob(i, ref_idx, sample_idx, g));
+                    probs.update(i, t, (1.0 / n_states) * emission_prob(i, ref_idx, sample_idx, g));
                 }
+				is_contig_boundary = false;
 			} else {
 		        auto jump_prob = 0.0;
                 auto dist = distance(ref_idx, last_ref_v_idx);
@@ -37,6 +39,8 @@ LSModel::forward_pass(double &theta, double &c, double &g) {
 			last_ref_v_idx = ref_idx;
 		}
 		++zipped;
+		++ct;
+		is_contig_boundary |= (cb.count(ct) != 0);
 	}
 
 	assert(t == n_obs);

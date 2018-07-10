@@ -1,5 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <vector>
+#include <set>
 #include <functional>
 #include <cmath>
 #include "doctest.h"
@@ -89,6 +90,7 @@ TEST_CASE("zip sites") {
 	CHECK(zipped_result.n_both == 2);
 	CHECK(zipped_result.n_only1 == 3);
 	CHECK(zipped_result.n_only2 == 2);
+	CHECK(zipped_result.contig_boundaries == std::set<std::size_t> {0, 5});
 
 	CHECK(*zipped[0].s1 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
 	CHECK(*zipped[0].s2 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
@@ -207,6 +209,29 @@ TEST_CASE("li_stephens_uneven") {
 
 	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
 	CHECK(doctest::Approx(f_likelihood) == 0.79815);
+}
+
+TEST_CASE("li_stevens_multiple_contigs") {
+	PLINKReader reference {"data/example3"};
+	PLINKReader sample {"data/example4"};
+
+	LSModel ls {reference, sample};
+
+    CHECK(ls.probs.n_rows == 1);
+    CHECK(ls.probs.n_cols == 2);
+
+    auto g = 0.01;
+    auto theta = 0.2;
+    auto c = 0.4;
+
+    auto f_likelihood = ls.forward_pass(theta, c, g);
+
+    std::vector<double> forward_probs_expected {
+        0.99, 0.99
+    };
+
+	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
+	CHECK(doctest::Approx(f_likelihood) == 0.99);
 }
 
 // optimization -- transpose probs matrix
