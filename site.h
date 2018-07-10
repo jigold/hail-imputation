@@ -57,4 +57,11 @@ struct ZippedSite {
 	const Site* s2;
 };
 
+struct ZippedResult {
+	std::vector<ZippedSite> zipped_sites;
+	std::size_t n_both;
+	std::size_t n_only1;
+	std::size_t n_only2;
+};
+
 #endif
