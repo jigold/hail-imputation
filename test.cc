@@ -149,14 +149,15 @@ TEST_CASE("li_stephens") {
 	PLINKReader sample {"data/example2"};
 	LSModel ls {reference, sample};
 
-	CHECK(ls.probs.n_rows == reference.n_samples);
-    CHECK(ls.probs.n_cols == reference.n_variants);
+	CHECK(ls.probs.n_rows == 10);
+    CHECK(ls.probs.n_cols == 5);
 
 	auto g = 0.01;
 	auto theta = 0.2;
 	auto c = 0.4;
 
-	auto f_likelihood = ls.forward_algorithm(theta, c, g);
+	auto f_likelihood = ls.forward_pass(theta, c, g);
+
 	std::vector<double> forward_probs_expected {
         0.099, 0.00152837, 0.000458004, 0.034414951, 0.000483335,
         0.099, 0.151308597, 0.001684301, 0.000357666, 0.000204497,
@@ -173,8 +174,39 @@ TEST_CASE("li_stephens") {
 	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
 	CHECK(doctest::Approx(f_likelihood) == 0.066071902);
 
-	auto b_likelihood = ls.backward_algorithm(theta, c, g);
-	CHECK(doctest::Approx(b_likelihood) == 0.066071902);
+//	auto b_likelihood = ls.backward_algorithm(theta, c, g);
+//	CHECK(doctest::Approx(b_likelihood) == 0.066071902);
+}
+
+TEST_CASE("li_stephens_uneven") {
+	PLINKReader reference {"data/example1"};
+	PLINKReader sample {"data/example3"};
+	LSModel ls {reference, sample};
+
+	CHECK(ls.probs.n_rows == 10);
+    CHECK(ls.probs.n_cols == 2);
+
+	auto g = 0.01;
+	auto theta = 0.2;
+	auto c = 0.4;
+
+	auto f_likelihood = ls.forward_pass(theta, c, g);
+
+	std::vector<double> forward_probs_expected {
+		0.099, 0.002625493,
+		0.099, 0.002625493,
+		0.099, 0.002625493,
+		0.099, 0.259923805,
+		0.099, 0.002625493,
+		0.099, 0.002625493,
+		0.099, 0.259923805,
+		0.099, 0.002625493,
+		0.099, 0.002625493,
+		0.099, 0.259923805
+	};
+
+	CHECK(ls.probs.same(MultiArray<double> {forward_probs_expected, ls.probs.n_rows, ls.probs.n_cols}, 1e-4));
+	CHECK(doctest::Approx(f_likelihood) == 0.79815);
 }
 
 // optimization -- transpose probs matrix
