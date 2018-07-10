@@ -57,6 +57,4 @@ struct ZippedSite {
 	const Site* s2;
 };
 
-std::vector<ZippedSite> zip_sites(const PLINKReader &pr1, const PLINKReader &pr2);
-
 #endif

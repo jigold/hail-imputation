@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "multiarray.h"
+#include "site.h"
 
 
 class LSModel {
