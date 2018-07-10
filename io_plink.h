@@ -18,13 +18,13 @@ class PLINKReader {
 					const std::string &fam_file) {
 						n_samples = read_fam(fam_file, samples);
 						n_variants = read_bim(bim_file, variants, sites);
-						row_sz = (n_samples + 3) / 4;
-						bed_sz = 3 + (n_variants * row_sz);
-						data_sz = n_variants * row_sz;
-						data = read_bed(bed_file, bed_sz);
+						row_sz_ = (n_samples + 3) / 4;
+						bed_sz_ = 3 + (n_variants * row_sz_);
+						data_sz = n_variants * row_sz_;
+						data = read_bed(bed_file, bed_sz_);
 					}
 
-		~PLINKReader() { munmap((void *) data, bed_sz); }
+		~PLINKReader() { munmap((void *) data, bed_sz_); }
 
 		std::vector<Variant> variants;
 		std::vector<std::string> samples;
@@ -37,11 +37,12 @@ class PLINKReader {
 		inline const std::size_t distance(const std::size_t &i, const std::size_t &j) const;
 
 	private:
-		std::size_t row_sz;
-		std::size_t bed_sz;
+		std::size_t row_sz_;
+		std::size_t bed_sz_;
+
         std::size_t read_bim(const std::string &bim_file, std::vector<Variant> &variants, std::vector<Site> &sites);
-        const std::size_t read_fam(const std::string &fam_file, std::vector<std::string> &samples);
-        const char *read_bed(const std::string &bed_file, const std::size_t &sz);
+        std::size_t read_fam(const std::string &fam_file, std::vector<std::string> &samples);
+        char *read_bed(const std::string &bed_file, const std::size_t &sz);
 };
 
 
@@ -50,7 +51,7 @@ const int
 PLINKReader::operator() (const std::size_t &v_idx, const std::size_t &s_idx) const {
 	assert(v_idx >= 0 && v_idx < n_variants && s_idx >= 0 && s_idx < n_samples);
 	int gt;
-	switch(data[(v_idx * row_sz) + (s_idx >> 2)] >> ((s_idx & 3) << 1) & 3) {
+	switch(data[(v_idx * row_sz_) + (s_idx >> 2)] >> ((s_idx & 3) << 1) & 3) {
 		case 0:
 			gt = 2;
 			break;
@@ -75,5 +76,8 @@ const std::size_t
 PLINKReader::distance(const std::size_t &i, const std::size_t &j) const {
 	return abs(variants[i].pos() - variants[j].pos());
 }
+
+std::vector<ZippedSite>
+zip_sites(const PLINKReader &pr1, const PLINKReader &pr2);
 
 #endif

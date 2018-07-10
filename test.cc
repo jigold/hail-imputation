@@ -24,6 +24,7 @@ TEST_CASE("variant") {
 	CHECK(v1 != v3);
 	CHECK(v1 < v3);
 	CHECK(!(v1 < v2));
+	CHECK(v4 > v1);
 
 	std::vector<Variant> variants {v1, v3, v6, v4, v5};
     std::sort(variants.begin(), variants.end());
@@ -75,6 +76,30 @@ TEST_CASE("plink loader") {
 	CHECK(pr.variants == variants);
 	CHECK(pr.samples == samples);
 	CHECK(data == data_expected);
+}
+
+TEST_CASE("zip sites") {
+	PLINKReader pr1 {"data/example1"};
+	PLINKReader pr3 {"data/example3"};
+
+	auto zipped = zip_sites(pr1, pr3);
+
+	CHECK(*zipped[0].s1 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
+	CHECK(*zipped[0].s2 == Site { Variant {"1", 1, "C", "A", 0}, 0 });
+	CHECK(*zipped[1].s1 == Site { Variant {"1", 2, "C", "A", 0}, 1 });
+	CHECK(zipped[1].s2 == nullptr);
+	CHECK(*zipped[2].s1 == Site { Variant {"1", 3, "C", "A", 0}, 2 });
+	CHECK(zipped[2].s2 == nullptr);
+	CHECK(*zipped[3].s1 == Site { Variant {"1", 4, "C", "A", 0}, 3 });
+	CHECK(zipped[3].s2 == nullptr);
+	CHECK(*zipped[4].s1 == Site { Variant {"1", 5, "C", "A", 0}, 4 });
+	CHECK(*zipped[4].s2 == Site { Variant {"1", 5, "C", "A", 0}, 2 });
+	CHECK(zipped[5].s1 == nullptr);
+	CHECK(*zipped[5].s2 == Site { Variant {"5", 2, "C", "A", 0}, 1 });
+	CHECK(zipped[6].s1 == nullptr);
+    CHECK(*zipped[6].s2 == Site { Variant {"5", 4, "C", "A", 0}, 3 });
+
+	CHECK(zipped.size() == 7);
 }
 
 

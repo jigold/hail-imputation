@@ -24,6 +24,7 @@ class Variant {
         bool operator==(const Variant &other) const;
 		bool operator!=(const Variant &other) const;
 		bool operator<(const Variant &other) const;
+		bool operator>(const Variant &other) const;
 
 	private:
 		std::string contig_;
@@ -66,6 +67,11 @@ bool Variant::operator<(const Variant& other) const {
     } else {
         return (alt_ < other.alt());
     };
+}
+
+inline
+bool Variant::operator>(const Variant& other) const {
+	return !(*this < other);
 }
 
 #endif
