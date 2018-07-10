@@ -12,15 +12,18 @@ class LSModel {
 
 		LSModel(const PLINKReader &reference,
 			const PLINKReader &sample, const std::size_t &s_idx): reference(reference), sample(sample),
-			s_idx(s_idx), probs(reference.n_samples, reference.n_variants) {
+			s_idx(s_idx) {
+				zipped_result = zip_sites(reference, sample);
 				n_states = reference.n_samples;
-                n_obs = reference.n_variants;
+                n_obs = zipped_result.n_both;
+                probs = MultiArray<double> {n_states, n_obs};
 			}
 
 		LSModel(const PLINKReader &reference, const PLINKReader &sample,
 			const std::size_t &s_idx, MultiArray<double> &probs): reference(reference), sample(sample), s_idx(s_idx), probs(probs) {
+			zipped_result = zip_sites(reference, sample);
             n_states = reference.n_samples;
-            n_obs = reference.n_variants;
+            n_obs = zipped_result.n_both;
             assert(probs.n_rows == n_states && probs.n_cols == n_obs);
         }
 
@@ -32,22 +35,25 @@ class LSModel {
 		std::size_t n_obs;
 		std::size_t s_idx;
 		MultiArray<double> probs;
+		ZippedResult zipped_result;
 
 		void set_sample_idx(std::size_t &i) { s_idx = i; }
 
-		double forward_algorithm(double &theta, double &c, double &g);
-		double backward_algorithm(double &theta, double &c, double &g);
+		double forward_pass(double &theta, double &c, double &g);
+
+//		double forward_algorithm(double &theta, double &c, double &g);
+//		double backward_algorithm(double &theta, double &c, double &g);
 
 	private:
-		inline double emission_prob(int const&, int const&, double const&) const;
-		inline std::size_t distance(int const&, int const&) const;
+		inline double emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, double const&) const;
+		std::size_t distance(const std::size_t &i, const std::size_t &j) const;
 };
 
 inline
 double
-LSModel::emission_prob(const int &i, const int &t, const double &g) const {
-    auto gt_i = reference(t, i);
-    auto gt_sample = sample(t, s_idx);
+LSModel::emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, const double &g) const {
+    auto gt_i = reference(reference_v_idx, i);
+    auto gt_sample = sample(sample_v_idx, s_idx);
 
     if (gt_i == gt_sample) {
         return (1 - g);
@@ -67,7 +73,7 @@ LSModel::emission_prob(const int &i, const int &t, const double &g) const {
 
 inline
 std::size_t
-LSModel::distance(const int &i, const int &j) const {
+LSModel::distance(const std::size_t &i, const std::size_t &j) const {
     return reference.distance(i, j);
 };
 
