@@ -8,10 +8,10 @@ class Variant {
     public:
         Variant(
         const std::string &contig,
-        const int &pos,
+        int pos,
         const std::string &ref,
         const std::string &alt,
-        const double &pos_cm) : contig_(contig), pos_(pos), ref_(ref), alt_(alt), pos_cm_(pos_cm) {
+        double pos_cm) : contig_(contig), pos_(pos), ref_(ref), alt_(alt), pos_cm_(pos_cm) {
             assert(contig_ != "");
         }
 

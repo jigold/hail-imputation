@@ -4,19 +4,5 @@
 #include <functional>
 #include "multiarray.h"
 
-const double call_rate(PLINKReader &pr);
-
-const double
-forward_algorithm(
-	MultiArray<double> &probs,
-	std::function<double(int)> start_prob,
-	std::function<double(int, int)> transition_prob,
-	std::function<double(int, int)> emission_prob);
-
-const double
-backward_algorithm(
-	MultiArray<double> &probs,
-	std::function<double(int)> start_prob,
-	std::function<double(int, int)> transition_prob,
-	std::function<double(int, int)> emission_prob);
+double call_rate(PLINKReader &pr);
 #endif

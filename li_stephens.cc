@@ -5,7 +5,7 @@
 #include "li_stephens.h"
 
 double
-LSModel::forward_pass(const double &theta, const double &c, const double &g) {
+LSModel::forward_pass(double theta, double c, double g) {
 	std::size_t t = 0;
 	std::size_t ct = 0;
 	std::size_t last_ref_v_idx = 0;
@@ -53,7 +53,7 @@ LSModel::forward_pass(const double &theta, const double &c, const double &g) {
 }
 
 double
-LSModel::backward_pass(const double &theta, const double &c, const double &g) {
+LSModel::backward_pass(double theta, double c, double g) {
 	std::size_t t = n_obs - 1;
 	std::size_t ct = zipped_result.zipped_sites.size() - 1;
 	std::size_t last_ref_v_idx = 0;
@@ -103,7 +103,7 @@ LSModel::backward_pass(const double &theta, const double &c, const double &g) {
 }
 
 void
-LSModel::compute_gamma(const double &p_obs) {
+LSModel::compute_gamma(double p_obs) {
 	for (auto t = 0; t < n_obs; ++t) {
 		for (auto i = 0; i < n_states; ++i) {
 			gamma(t, i) = alpha(t, i) * beta(t, i) / p_obs;
