@@ -5,7 +5,7 @@
 #include "li_stephens.h"
 
 double
-LSModel::forward_pass(double &theta, double &c, double &g) {
+LSModel::forward_pass(const double &theta, const double &c, const double &g) {
 	std::size_t t = 0;
 	std::size_t ct = 0;
 	std::size_t last_ref_v_idx = 0;
@@ -19,7 +19,7 @@ LSModel::forward_pass(double &theta, double &c, double &g) {
 			auto sample_idx = zipped->s2->idx();
 			if (is_contig_boundary) {
 			    for (auto i = 0; i < n_states; ++i) {
-                    alpha.update(i, t, (1.0 / n_states) * emission_prob(i, ref_idx, sample_idx, g));
+                    alpha(i, t) = emission_prob(i, ref_idx, sample_idx, g) / n_states;
                 }
 				is_contig_boundary = false;
 			} else {
@@ -32,7 +32,7 @@ LSModel::forward_pass(double &theta, double &c, double &g) {
                 jump_prob *= (1.0 - exp(-1 * theta * dist));
 
                 for (auto i = 0; i < n_states; ++i) {
-                    alpha.update(i, t, (alpha(i, t - 1) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g));
+                    alpha(i, t) = (alpha(i, t - 1) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g);
                 }
 			}
 			++t;
@@ -49,12 +49,11 @@ LSModel::forward_pass(double &theta, double &c, double &g) {
     for (auto i = 0; i < n_states; ++i) {
         total += alpha(i, n_obs - 1);
     }
-    assert(total >= 0.0 && total <= 1.0);
     return total;
 }
 
 double
-LSModel::backward_pass(double &theta, double &c, double &g) {
+LSModel::backward_pass(const double &theta, const double &c, const double &g) {
 	std::size_t t = n_obs - 1;
 	std::size_t ct = zipped_result.zipped_sites.size() - 1;
 	std::size_t last_ref_v_idx = 0;
@@ -74,7 +73,7 @@ LSModel::backward_pass(double &theta, double &c, double &g) {
 
 			if (is_contig_boundary) {
 			    for (auto i = 0; i < n_states; ++i) {
-					beta.update(i, t, emission_prob(i, ref_idx, sample_idx, g));
+					beta(i, t) = emission_prob(i, ref_idx, sample_idx, g);
                 }
 				is_contig_boundary = false;
 			} else {
@@ -87,7 +86,7 @@ LSModel::backward_pass(double &theta, double &c, double &g) {
                 jump_prob *= (1.0 - exp(-1 * theta * dist));
 
                 for (auto i = 0; i < n_states; ++i) {
-					beta.update(i, t, (beta(i, t + 1) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g));
+					beta(i, t) = (beta(i, t + 1) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g);
                 }
 			}
 			--t;
@@ -104,9 +103,14 @@ LSModel::backward_pass(double &theta, double &c, double &g) {
 	for (auto i = 0; i < n_states; ++i) {
 		total += beta(i, 0) / n_states;
 	}
-	assert(total >= 0.0 && total <= 1.0);
 	return total;
 }
 
-// TODO
-// 3. EM from reference to estimate parameters
+void
+LSModel::compute_gamma(const double &p_obs) {
+	for (auto i = 0; i < n_states; ++i) {
+		for (auto t = 0; t < n_obs; ++t) {
+			gamma(i, t) = alpha(i, t) * beta(i, t) / p_obs;
+		}
+	}
+}
