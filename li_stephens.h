@@ -15,9 +15,9 @@ class LSModel {
 				zipped_result = zip_sites(reference, sample);
 				n_states = reference.n_samples;
                 n_obs = zipped_result.n_both;
-                alpha = MultiArray<double> {n_states, n_obs};
-				beta = MultiArray<double> {n_states, n_obs};
-				gamma = MultiArray<double> {n_states, n_obs};
+                alpha = MultiArray<double> {n_obs, n_states};
+				beta = MultiArray<double> {n_obs, n_states};
+				gamma = MultiArray<double> {n_obs, n_states};
 			}
 
 		PLINKReader reference;
@@ -32,18 +32,18 @@ class LSModel {
 
 		void set_sample_idx(std::size_t &i) { s_idx = i; }
 
-		double forward_pass(const double &theta, const double &c, const double &g);
-		double backward_pass(const double &theta, const double &c, const double &g);
-		void compute_gamma(const double &p_obs);
+		double forward_pass(double theta, double c, double g);
+		double backward_pass(double theta, double c, double g);
+		void compute_gamma(double p_obs);
 
 	private:
-		inline double emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, double const&) const;
-		std::size_t distance(const std::size_t &i, const std::size_t &j) const;
+		inline double emission_prob(std::size_t i, std::size_t reference_v_idx, std::size_t sample_v_idx, double g) const;
+		std::size_t distance(std::size_t i, std::size_t j) const;
 };
 
 inline
 double
-LSModel::emission_prob(const std::size_t &i, const std::size_t &reference_v_idx, const std::size_t &sample_v_idx, const double &g) const {
+LSModel::emission_prob(std::size_t i, std::size_t reference_v_idx, std::size_t sample_v_idx, double g) const {
     auto gt_i = reference(reference_v_idx, i);
     auto gt_sample = sample(sample_v_idx, s_idx);
 
@@ -58,7 +58,7 @@ LSModel::emission_prob(const std::size_t &i, const std::size_t &reference_v_idx,
 
 inline
 std::size_t
-LSModel::distance(const std::size_t &i, const std::size_t &j) const {
+LSModel::distance(std::size_t i, std::size_t j) const {
     return reference.distance(i, j);
 };
 

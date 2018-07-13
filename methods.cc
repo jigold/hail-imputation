@@ -3,7 +3,7 @@
 #include <math.h>
 #include "io_plink.h"
 
-const double
+double
 call_rate(PLINKReader &pr) {
 	long total = 0;
 	long n_missing = 0;

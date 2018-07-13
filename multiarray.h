@@ -8,10 +8,10 @@ class MultiArray {
 	public:
 		MultiArray(
 		std::vector<T> &a_,
-		const std::size_t &n_rows_,
-		const std::size_t &n_cols_): a(a_), n_rows(n_rows_), n_cols(n_cols_) {}
+		std::size_t n_rows_,
+		std::size_t n_cols_): a(a_), n_rows(n_rows_), n_cols(n_cols_) {}
 
-		MultiArray(const std::size_t &n_rows_, const std::size_t &n_cols_): a(), n_rows(n_rows_), n_cols(n_cols_) {
+		MultiArray(std::size_t n_rows_, std::size_t n_cols_): a(), n_rows(n_rows_), n_cols(n_cols_) {
 			a.resize(n_rows * n_cols);
 		}
 
@@ -35,7 +35,7 @@ class MultiArray {
             a.resize(i * j);
         }
 
-        bool same (const MultiArray<T> &other, const double &tolerance) const;
+        bool same (const MultiArray<T> &other, double tolerance) const;
 
 		std::string to_string() const;
 };

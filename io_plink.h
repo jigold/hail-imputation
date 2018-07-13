@@ -33,8 +33,8 @@ class PLINKReader {
 		std::size_t n_variants;
 		std::size_t data_sz;
 		const char *data;
-		inline const int operator() (const std::size_t &v_idx, const std::size_t &s_idx) const;
-		inline const std::size_t distance(const std::size_t &i, const std::size_t &j) const;
+		inline int operator() (std::size_t v_idx, std::size_t s_idx) const;
+		inline std::size_t distance(std::size_t i, std::size_t j) const;
 
 	private:
 		std::size_t row_sz_;
@@ -47,8 +47,8 @@ class PLINKReader {
 
 
 inline
-const int
-PLINKReader::operator() (const std::size_t &v_idx, const std::size_t &s_idx) const {
+int
+PLINKReader::operator() (std::size_t v_idx, std::size_t s_idx) const {
 	assert(v_idx >= 0 && v_idx < n_variants && s_idx >= 0 && s_idx < n_samples);
 	int gt;
 	switch(data[(v_idx * row_sz_) + (s_idx >> 2)] >> ((s_idx & 3) << 1) & 3) {
@@ -72,8 +72,8 @@ PLINKReader::operator() (const std::size_t &v_idx, const std::size_t &s_idx) con
 
 
 inline
-const std::size_t
-PLINKReader::distance(const std::size_t &i, const std::size_t &j) const {
+std::size_t
+PLINKReader::distance(std::size_t i, std::size_t j) const {
 	return abs(variants[i].pos() - variants[j].pos());
 }
 

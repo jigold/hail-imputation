@@ -4,7 +4,7 @@
 #include "multiarray.h"
 
 template <class T>
-bool MultiArray<T>::same (const MultiArray<T> &other, const double &tolerance) const {
+bool MultiArray<T>::same (const MultiArray<T> &other, double tolerance) const {
 	assert(n_rows == other.n_rows && n_cols == other.n_cols);
 	bool same = true;
 	for (auto i = 0; i < n_rows; ++i) {
