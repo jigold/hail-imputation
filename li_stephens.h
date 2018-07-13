@@ -5,7 +5,6 @@
 #include "multiarray.h"
 #include "site.h"
 
-
 class LSModel {
 	public:
 		LSModel(PLINKReader &reference, PLINKReader &sample): LSModel(reference, sample, 0) {}
@@ -20,8 +19,6 @@ class LSModel {
 				beta = MultiArray<double> {n_states, n_obs};
 				gamma = MultiArray<double> {n_states, n_obs};
 			}
-
-		// FIXME: add destructor
 
 		PLINKReader reference;
 		PLINKReader sample;

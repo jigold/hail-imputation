@@ -129,23 +129,6 @@ TEST_CASE("multiarray") {
 	CHECK(ma.same(ma, 1e-4));
 }
 
-TEST_CASE("forward_algorithm + backward_algorithm") {
-	int n_states = 5;
-	int t = 6;
-	int n_possible_obs = 3;
-	std::function<double(int const&)> start_prob = [n_states](int i) { return 1.0 / n_states; };
-	std::function<double(int const&, int const&)> trans_prob = [n_states](int i, int j) { return 1.0 / n_states; };
-	std::function<double(int const&, int const&)> emission_prob = [](int i, int t) { return 1.0 / 3.0; };
-
-	MultiArray<double> probs(n_states, t);
-
-	double likelihood = forward_algorithm(probs, start_prob, trans_prob, emission_prob);
-	CHECK(doctest::Approx(likelihood) == 1.0 / pow(n_possible_obs, t));
-
-	likelihood = backward_algorithm(probs, start_prob, trans_prob, emission_prob);
-	CHECK(doctest::Approx(likelihood) == 1.0 / pow(n_possible_obs, t));
-}
-
 TEST_CASE("li_stephens") {
 	PLINKReader reference {"data/example1"};
 	PLINKReader sample {"data/example2"};
