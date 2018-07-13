@@ -2,6 +2,7 @@
 #define __VARIANT_H__
 
 #include <string>
+#include <assert.h>
 
 class Variant {
     public:
@@ -19,7 +20,6 @@ class Variant {
         std::string ref() const { return ref_; }
         std::string alt() const { return alt_; }
         double pos_cm() const { return pos_cm_; }
-
 
         std::string to_string() const;
 
