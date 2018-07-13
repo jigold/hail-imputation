@@ -15,9 +15,9 @@ class LSModel {
 				zipped_result = zip_sites(reference, sample);
 				n_states = reference.n_samples;
                 n_obs = zipped_result.n_both;
-                alpha = MultiArray<double> {n_states, n_obs};
-				beta = MultiArray<double> {n_states, n_obs};
-				gamma = MultiArray<double> {n_states, n_obs};
+                alpha = MultiArray<double> {n_obs, n_states};
+				beta = MultiArray<double> {n_obs, n_states};
+				gamma = MultiArray<double> {n_obs, n_states};
 			}
 
 		PLINKReader reference;
