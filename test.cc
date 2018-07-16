@@ -139,7 +139,7 @@ TEST_CASE("li_stephens") {
 
 	auto g = 0.01;
 	auto theta = 0.2;
-	auto c = 0.4;
+	std::vector<double> c(10, 0.4);
 
 	auto f_likelihood = ls.forward_pass(theta, c, g);
 
@@ -168,7 +168,7 @@ TEST_CASE("li_stephens_uneven") {
 
 	auto g = 0.01;
 	auto theta = 0.2;
-	auto c = 0.4;
+	std::vector<double> c(10, 0.4);
 
 	auto f_likelihood = ls.forward_pass(theta, c, g);
 
@@ -195,12 +195,13 @@ TEST_CASE("li_stevens_multiple_contigs") {
 
     auto g = 0.01;
     auto theta = 0.2;
-    auto c = 0.4;
+    std::vector<double> c(1, 0.4);
 
     auto f_likelihood = ls.forward_pass(theta, c, g);
 
     std::vector<double> forward_probs_expected {
-        1.98, 1.98
+        1.98, 
+		1.98
     };
 
 	CHECK(ls.alpha.same(MultiArray<double> {forward_probs_expected, ls.alpha.n_rows, ls.alpha.n_cols}, 1e-4));
@@ -216,7 +217,7 @@ TEST_CASE("li_stephens_identical_haplotype") {
 
     auto g = 0.01;
     auto theta = 0.2;
-    auto c = 0.4;
+    std::vector<double> c(10, 0.4);
 
 	LSModel ls {reference, sample, 0};
 	auto f_likelihood = ls.forward_pass(theta, c, g);
@@ -226,5 +227,3 @@ TEST_CASE("li_stephens_identical_haplotype") {
 
 	printf("%s\n", ls.gamma.to_string().c_str());
 }
-
-// optimization -- transpose probs matrix
