@@ -1,11 +1,14 @@
 #include <math.h>
 #include <iostream>
+#include <vector>
 #include "io_plink.h"
 #include "multiarray.h"
 #include "li_stephens.h"
 
 double
-LSModel::forward_pass(double theta, double c, double g) {
+LSModel::forward_pass(double theta, std::vector<double> c, double g) {
+	assert(c.size() == n_states);
+
 	std::size_t t = 0;
 	std::size_t ct = 0;
 	std::size_t last_ref_v_idx = 0;
@@ -32,7 +35,7 @@ LSModel::forward_pass(double theta, double c, double g) {
                 jump_prob *= (1.0 - exp(-1 * theta * dist));
 
                 for (auto i = 0; i < n_states; ++i) {
-                    alpha(t, i) = (alpha(t - 1, i) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g);
+                    alpha(t, i) = (alpha(t - 1, i) * (exp(-1 * theta * dist)) + jump_prob * c[i]) * emission_prob(i, ref_idx, sample_idx, g);
                 }
 			}
 			++t;
@@ -53,7 +56,9 @@ LSModel::forward_pass(double theta, double c, double g) {
 }
 
 double
-LSModel::backward_pass(double theta, double c, double g) {
+LSModel::backward_pass(double theta, std::vector<double> c, double g) {
+	assert(c.size() == n_states);
+	
 	std::size_t t = n_obs - 1;
 	std::size_t ct = zipped_result.zipped_sites.size() - 1;
 	std::size_t last_ref_v_idx = 0;
@@ -82,7 +87,7 @@ LSModel::backward_pass(double theta, double c, double g) {
                 jump_prob *= (1.0 - exp(-1 * theta * dist));
 
                 for (auto i = 0; i < n_states; ++i) {
-					beta(t, i) = (beta(t + 1, i) * (exp(-1 * theta * dist)) + jump_prob * c) * emission_prob(i, ref_idx, sample_idx, g);
+					beta(t, i) = (beta(t + 1, i) * (exp(-1 * theta * dist)) + jump_prob * c[i]) * emission_prob(i, ref_idx, sample_idx, g);
                 }
 			}
 			--t;

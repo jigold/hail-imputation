@@ -1,7 +1,7 @@
 #ifndef __LI_STEPHENS_H__
 #define __LI_STEPHENS_H__
 
-#include <functional>
+#include <vector>
 #include "multiarray.h"
 #include "site.h"
 
@@ -32,8 +32,8 @@ class LSModel {
 
 		void set_sample_idx(std::size_t &i) { s_idx = i; }
 
-		double forward_pass(double theta, double c, double g);
-		double backward_pass(double theta, double c, double g);
+		double forward_pass(double theta, std::vector<double> c, double g);
+		double backward_pass(double theta, std::vector<double> c, double g);
 		void compute_gamma(double p_obs);
 
 	private:
