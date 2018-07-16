@@ -227,3 +227,23 @@ TEST_CASE("li_stephens_identical_haplotype") {
 
 	printf("%s\n", ls.gamma.to_string().c_str());
 }
+
+TEST_CASE("li_stephens_expectation_maximization") {
+	PLINKReader reference {"data/example5"};
+	PLINKReader sample {"data/example5-chimera"};
+
+    auto g = 0.01;
+    auto theta = 0.2;
+    std::vector<double> c(10, 0.4);
+
+	LSModel ls {reference, sample};
+	EMResult emr = ls.em(theta, c, g, 0.001, 10);	
+	for (auto i = 0; i < ls.n_states; ++i) {
+		if (i == 0 || i == 1) {
+			CHECK(emr.c[i] >= 0.4);
+			CHECK(emr.c[i] <= 0.5);
+		} else {
+			CHECK(emr.c[i] < 0.05);
+		}
+	}
+}

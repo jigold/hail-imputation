@@ -5,6 +5,13 @@
 #include "multiarray.h"
 #include "site.h"
 
+struct EMResult {
+	double theta;
+	std::vector<double> c; // should this be a pointer?
+	double g;
+	std::size_t n_iterations;
+};
+
 class LSModel {
 	public:
 		LSModel(PLINKReader &reference, PLINKReader &sample): LSModel(reference, sample, 0) {}
@@ -35,6 +42,8 @@ class LSModel {
 		double forward_pass(double theta, std::vector<double> c, double g);
 		double backward_pass(double theta, std::vector<double> c, double g);
 		void compute_gamma(double p_obs);
+		void normalize_row(MultiArray<double> ma, std::size_t row_idx);
+		EMResult em(double theta, std::vector<double> c, double g, double tolerance, std::size_t max_iterations);
 
 	private:
 		inline double emission_prob(std::size_t i, std::size_t reference_v_idx, std::size_t sample_v_idx, double g) const;

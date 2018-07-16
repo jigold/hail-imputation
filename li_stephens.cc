@@ -1,9 +1,21 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include "io_plink.h"
 #include "multiarray.h"
 #include "li_stephens.h"
+
+void
+LSModel::normalize_row(MultiArray<double> ma, std::size_t row_idx) {
+	double sum = 0.0;
+	for (auto col_idx = 0; col_idx < n_states; ++col_idx) {
+		sum += ma(row_idx, col_idx);
+	}
+	for (auto col_idx = 0; col_idx < n_states; ++col_idx) {
+		ma(row_idx, col_idx) /= sum;
+	}
+}
 
 double
 LSModel::forward_pass(double theta, std::vector<double> c, double g) {
@@ -114,4 +126,51 @@ LSModel::compute_gamma(double p_obs) {
 			gamma(t, i) = alpha(t, i) * beta(t, i) / p_obs;
 		}
 	}
+}
+
+EMResult
+LSModel::em(double theta, std::vector<double> c, double g, double tolerance, std::size_t max_iterations) {
+	std::vector<double> c_new(n_states);
+	std::size_t	iter_no = 0;
+	while (iter_no < max_iterations) {
+		forward_pass(theta, c, g);
+
+		double row_sum = 0.0;
+		for (auto t = 0; t < n_obs; ++t) {
+			for (auto i = 0; i < n_states; ++i) {
+				row_sum += alpha(t, i);
+			}	
+			for (auto i = 0; i < n_states; ++i) {
+				c_new[i] += alpha(t, i) / row_sum;
+			}		
+		}
+
+		double c_new_sum = 0.0;
+		for (auto i = 0; i < n_states; ++i) {
+			c_new_sum += c_new[i];
+		}
+
+		bool within_tolerance = true;
+		printf("iteration #%zu\n", iter_no);
+		for (auto i = 0; i < n_states; ++i) {
+			c_new[i] /= c_new_sum;
+			printf("idx %i: (%f, %f)\n", i, c[i], c_new[i]);
+			if (std::abs(c_new[i] - c[i]) > tolerance) {
+				within_tolerance = false;
+			}
+		}
+		printf("\n");
+
+		c = c_new;
+
+		if (within_tolerance) {
+			break;
+		}
+
+		++iter_no;
+	}
+
+	EMResult emr {theta, c, g, iter_no};
+
+	return emr;
 }
