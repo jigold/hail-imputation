@@ -18,7 +18,7 @@ LSModel::normalize_row(MultiArray<double> ma, std::size_t row_idx) {
 }
 
 double
-LSModel::forward_pass(double theta, std::vector<double> c, double g) {
+LSModel::forward_pass(double theta, const std::vector<double> &c, double g) {
 	assert(c.size() == n_states);
 
 	std::size_t t = 0;
@@ -68,7 +68,7 @@ LSModel::forward_pass(double theta, std::vector<double> c, double g) {
 }
 
 double
-LSModel::backward_pass(double theta, std::vector<double> c, double g) {
+LSModel::backward_pass(double theta, const std::vector<double> &c, double g) {
 	assert(c.size() == n_states);
 	
 	std::size_t t = n_obs - 1;
