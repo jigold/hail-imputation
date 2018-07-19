@@ -29,13 +29,24 @@ class LSModel(object):
     def emission(self, ref_v_idx, sample_v_idx, state):
         g_ref = self._reference[ref_v_idx, state]
         g_sample = self._sample[sample_v_idx, self._sample_idx]
-        
+
         if g_ref == None or g_sample == None:
             return 1
         elif g_ref == g_sample:
             return 2 * (1 - self._g)
         else:
             return 2 * self._g
+
+    def transition_matrix(self):
+        transition_probs = np.zeros((self._n_states, self._n_states))
+        for i in range(self._n_states):
+            for j in range(self._n_states):
+                if i == j:
+                    transition_probs[i, j] = math.exp(-self._theta) + self._c[i] * (1 - math.exp(-self._theta))
+                else:
+                    transition_probs[i, j] = self._c[i] * (1 - math.exp(-self._theta))
+        
+        return transition_probs
 
     def forward_pass(self):
         jump_prob = 1 - math.exp(-1 * self._theta * 1) # hardcoded distance as 1 for balding nichols generated examples
@@ -70,3 +81,46 @@ class LSModel(object):
         return (self._beta[0, :] * emission / self._n_states).sum()
 
     
+class HMM(object):
+    def __init__(self, observations, transition, emission, initial):
+        self._observations = observations # numpy array
+        self._transition = transition
+        self._emission = emission
+        self._initial = initial
+
+        self._n_states = self._transition.shape[0]
+        self._n_obs = self._observations.shape[0]
+
+        assert(self._initial.size == self._n_states)
+
+        shape = (self._n_obs, self._n_states)
+        self._alpha = np.zeros(shape)
+        self._beta = np.zeros(shape)
+        self._gamma = np.zeros(shape)
+
+    def normalize(self, a, row_idx):
+        a[row_idx, :] = a[row_idx, :] / a[row_idx, :].sum()
+
+    def forward_pass(self):
+        # initialize
+        e = np.array([self._emission[i, self._observations[0]] for i in range(self._n_states)])
+        self._alpha[0, :] = self._initial * e
+        self.normalize(self._alpha, 0)
+
+        # recursion
+        for t in range(1, self._n_obs):
+            for j in range(self._n_states):
+                total = 0.0
+                for i in range(self._n_states):
+                    total += self._alpha[t - 1, i] * self._transition[i, j]
+                self._alpha[t, j] = total * self._emission[j, self._observations[t]]
+            self.normalize(self._alpha, t)
+        
+        # terminate
+        observation_likelihood = 0.0
+        for i in range(self._n_states):
+            observation_likelihood += self._alpha[self._n_obs - 1, i]
+
+        print(self._alpha)
+        print(observation_likelihood)
+        return observation_likelihood
